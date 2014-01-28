@@ -1,4 +1,4 @@
-# TextareaBackup
+# [TextareaBackup](https://github.com/kafene/TextareaBackup)
 
 Keep backups of text entered into text fields
 
