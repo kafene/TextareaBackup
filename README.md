@@ -1,6 +1,6 @@
 # TextareaBackup
 
-Keep backups of text entered into textarea elements (and contentEditable ones too!)
+Keep backups of text entered into text fields
 
 ---
 
@@ -11,6 +11,9 @@ automatically backs up whatever you type into text fields (multiline ones).
 When the page is refreshed or opened again, if there is text you have typed
 in the past, the text field is highlighted in red and you can double click
 on it to restore the previous text.
+
+It works on both textarea elements (regardless of whether they are inside
+a form), and contentEditable elements.
 
 ### Why is this useful?
 
@@ -31,12 +34,12 @@ Create a new script in it, and paste the entire contents of
 
 ## Options:
 
-- `expire`: the time (in ms) that items expire after.
-  To calculate the milliseconds you can Google, for
-  example "1 day in ms", which is 86400000 ms.
+- `expire`: the time (in ms) that items expire after. To calculate it
+  you can use the formula: `(((days * 24) + hours) * 60 + minutes) * 60000`,
+  for example 1 day is 86400000.
 
-- `keepAfterSubmit`: Keep saved texts after submitting
-  their associated forms (where applicable).
+- `keepAfterSubmit`: Keep saved texts after submitting their
+  associated forms (where applicable).
 
 These options can be found `Textareabackup.user.js`,
 near the top, under the line reading "`// Options:`"
@@ -45,6 +48,6 @@ near the top, under the line reading "`// Options:`"
 
 - Backups for `<select>` and `<input>` as well.
 - Improve unique element IDs (`ref()` function)
-- Better restore of previous text (e.g. if a
-  backup is accidentally restored after typing
-  something new).
+- Better restore of previous text (e.g. if a backup is accidentally
+  restored after typing something new).
+- More tests of backup functionality on contentEditables.
