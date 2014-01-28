@@ -1,4 +1,3 @@
-/*
 // ==UserScript==
 // @name          TextareaBackup
 // @description   Keep backups of text entered into text fields
@@ -14,7 +13,6 @@
 // @include       *
 // @run-at        document-end
 // ==/UserScript==
-*/
 
 /* ########################################################################### /
 
