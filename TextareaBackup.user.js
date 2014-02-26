@@ -1,3 +1,4 @@
+/*
 // ==UserScript==
 // @name          TextareaBackup
 // @description   Keep backups of text entered into text fields
@@ -13,6 +14,7 @@
 // @include       *
 // @run-at        document-end
 // ==/UserScript==
+*/
 
 /* ########################################################################### /
 
@@ -34,36 +36,88 @@
 
 / ########################################################################### */
 
-(function backupTextareas() {
+/*
+
+# [TextareaBackup](https://github.com/kafene/TextareaBackup)
+
+Keep backups of text entered into text fields
+
+---
+
+## What is it?
+
+This is a userscript - a javascript file your browser runs - that
+automatically backs up whatever you type into text fields (multiline ones).
+When the page is refreshed or opened again, if there is text you have typed
+in the past, the text field is highlighted in red and you can double click
+on it to restore the previous text.
+
+It works on both textarea elements (regardless of whether they are inside
+a form), and contentEditable elements.
+
+### Why is this useful?
+
+If you've ever accidentally closed or reloaded a page when typing into a form,
+and lost everything you typed, and you don't want it to happen again, this
+will help. It's not guaranteed to work on every text field you come across,
+but the large majority of them should work.
+
+## Installation:
+
+Place `TextareaBackup.user.js` in your browser's userscript folder.
+
+If you don't know what that is or your browser does not support
+this behavior, install a userscript plugin or browser extension,
+like TamperMonkey for Chromium or Greasemonkey for Firefox.
+Create a new script in it, and paste the entire contents of
+`TextareaBackup.user.js` into it.
+
+## Options:
+
+- `expire`: the time (in ms) that items expire after. To calculate it
+  you can use the formula: `(((days * 24) + hours) * 60 + minutes) * 60000`,
+  for example 1 day is 86400000.
+
+- `keepAfterSubmit`: Keep saved texts after submitting their
+  associated forms (where applicable).
+
+These options can be found `Textareabackup.user.js`,
+near the top, under the line reading "`// Options:`"
+
+## Todo:
+
+- Backups for `<select>` and `<input>` as well.
+- Improve unique element IDs (`ref()` function)
+- Better restore of previous text (e.g. if a backup is accidentally
+  restored after typing something new).
+- More tests of backup functionality on contentEditables.
+
+*/
+
+(function backupTextareas(window, undefined) {
 
     // Options:
     var expire = 86400000; // 1 day
     var keepAfterSubmit = false;
 
-
-
-    var win = window.wrappedJSObject || window;
-
     // Wait until DOM is loaded before doing anything
-    if (!/^loaded|complete|interactive/i.test(win.document.readyState)) {
-        win.document.addEventListener('DOMContentLoaded', backupTextareas);
+    var document = window.document;
+    if (!/^loaded|complete|interactive/i.test(document.readyState)) {
+        document.addEventListener('DOMContentLoaded', backupTextareas);
         return;
     }
 
-    var storage = win.localStorage || win.globalStorage[win.document.domain];
+    var storage = window.localStorage || window.globalStorage[document.domain];
     var selector = 'textarea, [contentEditable]';
-    var editableNodes = [].slice.call(win.document.querySelectorAll(selector));
-    var prefix = 'TextAreaBackup:' + win.location.pathname + '#';
+    var editableNodes = [].slice.call(document.querySelectorAll(selector));
+    var prefix = 'TextAreaBackup:' + window.location.pathname + '#';
 
-    if (!storage || !editableNodes.length) {
-        return;
-    }
+    if (!storage || !editableNodes.length) {return}
 
     // [].forEach.call helper
-    var each = function (collection, callback) {
-        [].forEach.call(collection, callback);
-    };
+    var each = function (obj, fn) {[].forEach.call(obj, fn)};
 
+    // get a unique identifying for a node.
     var ref = function (node) {
         if (node.id || node.name) {
             return prefix + (node.id || '') + (node.name || '');
@@ -96,9 +150,7 @@
             for (var i = 0; i < storage.length; i++) {
                 key = storage.key(i);
 
-                if (0 !== key.indexOf('TextAreaBackup:')) {
-                    continue;
-                }
+                if (0 !== key.indexOf('TextAreaBackup:')) {continue}
 
                 try {
                     item = JSON.parse(storage.getItem(key));
@@ -111,10 +163,7 @@
                     var diff = (+new Date()) - item.time;
                     var expired = diff >= expire;
                     var empty = String(item.value).trim() == '';
-
-                    if (expired || empty) {
-                        storage.removeItem(key);
-                    }
+                    if (empty || expired) {storage.removeItem(key)}
                 }
             }
         }
@@ -140,10 +189,9 @@
 
     var listener = function (event) {
         var node = event.target || event.srcElement;
-        var key = ref(node);
         var value = getNodeValue(node);
         var time = (new Date()).getTime();
-
+        var key = ref(node);
         if (key) {
             try {
                 storage.setItem(key, JSON.stringify({
@@ -251,9 +299,7 @@
 
     var initDOMNodeInsterted = function () {
         document.addEventListener('DOMNodeInserted', function (event) {
-            if (event.target) {
-                backupInsertedNode(event.target);
-            }
+            if (event && event.target) {backupInsertedNode(event.target)}
         });
     };
 
@@ -261,4 +307,4 @@
     each(editableNodes, initBackup);
     initMutationObserver();
     initDOMNodeInsterted();
-})();
+})(window.wrappedJSObject || window);
