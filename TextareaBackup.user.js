@@ -128,7 +128,7 @@ near the top, under the line reading "`// Options:`"
     };
 
     var isTextarea = function (node) {
-        return (node && node instanceof win.HTMLTextAreaElement);
+        return (node && node instanceof window.HTMLTextAreaElement);
     };
 
     var isContentEditable = function (node) {
@@ -234,7 +234,7 @@ near the top, under the line reading "`// Options:`"
 
             // apply a red border indicator, restore on double click.
             if (item && item.value) {
-                //var originalBorder = win.getComputedStyle(node).border;
+                //var originalBorder = window.getComputedStyle(node).border;
                 node.style.border = '2px solid red';
                 node.addEventListener('dblclick', function () {
                     if (node.getAttribute('data-text-restored') === 'yes') {
@@ -279,9 +279,9 @@ near the top, under the line reading "`// Options:`"
     };
 
     var initMutationObserver = function () {
-        var MutationObserver = win.MutationObserver ||
-            win.WebKitMutationObserver ||
-            win.MozMutationObserver;
+        var MutationObserver = window.MutationObserver ||
+            window.WebKitMutationObserver ||
+            window.MozMutationObserver;
 
         if (typeof(MutationObserver) !== 'undefined') {
             (new MutationObserver(function (mutations) {
@@ -290,7 +290,7 @@ near the top, under the line reading "`// Options:`"
                         backupInsertedNode(node);
                     });
                 });
-            }).observe(win.document.documentElement, {
+            }).observe(document.documentElement, {
                 subtree: true,
                 childList: true
             }));
